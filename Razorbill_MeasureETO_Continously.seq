@@ -1,0 +1,15 @@
+!FLD FIELD 0.0 100.0 2 0
+!WAI WAITFOR 10 0 1 0 0 0
+ETODF 'C:\QdDynacool\Data\User Data\Andrea\Razorbill-CsV3Sb5-BRO6-8-5-22\Strain-CsV3Sb5-BRO6_SC.dat' 0 Untitled
+LPC SCANC 99999.0 100000 0
+ETOR 'C:\QdDynacool\default_ETO.qmap' 0 3 1 0 1 128.1738 3.00 0 3 2 1 0 0
+ENC EOS
+LPC SCANC 99999.0 100000 0
+ETOR 'C:\QdDynacool\default_ETO.qmap' 0 3 1 0 1 128.1738 3.00 0 3 2 1 0 0
+ENC EOS
+LPC SCANC 99999.0 100000 0
+ETOR 'C:\QdDynacool\default_ETO.qmap' 0 3 1 0 1 128.1738 3.00 0 3 2 1 0 0
+ENC EOS
+LPC SCANC 99999.0 100000 0
+ETOR 'C:\QdDynacool\default_ETO.qmap' 0 3 1 0 1 128.1738 3.00 0 3 2 1 0 0
+ENC EOS
