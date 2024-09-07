@@ -341,7 +341,7 @@ class RazorbillProgrammer (object):
                                                                    "equilibration to F_min and Temp choice."})
 
                 # if we have a stable field and we're within tolerance to F_min, we're in the Ready state.
-                elif self.D3.field_status in ["Stable", "Holding"] and ((fmin+ftol) >= self.D3.field >= (fmin-ftol)):
+                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmin+ftol) >= self.D3.field >= (fmin-ftol)):
                     print(f'waiting {self.wait_t/60} min')
                     self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for field stabilization. \n"
                                                                    f'time to wait: {self.wait_t/60}'
@@ -353,14 +353,14 @@ class RazorbillProgrammer (object):
                                                                    "and begin a new field ramp profile."})
                     
                 # if we have a stable field and we're within tolerance to f_max, we're in the Finished state.
-                elif self.D3.field_status in ["Stable", "Holding"] and ((fmax+ftol) >= self.D3.field >= (fmax-ftol)):
+                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmax+ftol) >= self.D3.field >= (fmax-ftol)):
                     self.monitorState = "Finished"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the FINISHED state. \n"
                                                                    "A strain measurement has completed and we are \n"
                                                                    "ready to begin ramping back to fmin Oe."})
                     
                 # if we have a changing field we wait for stabilization
-                elif self.D3.field_status in ["Stable", "Holding", "Ramping", "Iterating"]:
+                elif self.D3.field_status in ["Stable", "Holding (Driven)", "Ramping", "Iterating"]:
                     self.monitorState = "Busy"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the BUSY state. \n "
                                                                    "We are ramping to base field, or a strain measurement\n"
@@ -382,7 +382,7 @@ class RazorbillProgrammer (object):
                                                                    "equilibration to F_min and Temp choice."})
 
                 # if we have a stable field and we're within tolerance to f_min1, we're in the Ready1 state.
-                elif self.D3.field_status in ["Stable", "Holding"] and ((fmin + ftol) >= self.D3.field >= (fmin - ftol)):
+                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmin + ftol) >= self.D3.field >= (fmin - ftol)):
 
                     print(f'waiting {self.wait_t1/60} min')
                     self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for thermalization. \n"
@@ -394,7 +394,7 @@ class RazorbillProgrammer (object):
                                                                    "We are ready to begin another strain increment\n"
                                                                    "and begin a new field ramp profile."})
                 # if we have a stable field and we're within tolerance to f_min1, we're in the Ready1 state.
-                elif self.D3.field_status in ["Stable", "Holding"] and ((fmin2 + ftol) >= self.D3.field >= (fmin2 - ftol)):
+                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmin2 + ftol) >= self.D3.field >= (fmin2 - ftol)):
 
                     print(f'waiting {self.wait_t2/60} min')
                     self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for thermalization. \n"
@@ -406,19 +406,19 @@ class RazorbillProgrammer (object):
                                                                    "We are ready to begin another strain increment\n"
                                                                    "and begin a new field ramp profile."})
                 # if we have a stable field and we're within tolerance to f_max, we're in the Finished state.
-                elif self.D3.field_status in ["Stable", "Holding"] and ((fmax + ftol) >= self.D3.field >= (fmax - ftol)):
+                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmax + ftol) >= self.D3.field >= (fmax - ftol)):
                     self.monitorState = "Finished1"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the FINISHED1 state. \n"
                                                                    "A strain measurement has completed and we are \n"
                                                                    "ready to begin ramping back to base field."})
                 # if we have a stable field and we're within tolerance to f_max, we're in the Finished state.
-                elif self.D3.field_status in ["Stable", "Holding"] and ((fmax2 + ftol) >= self.D3.field >= (fmax2 - ftol)):
+                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmax2 + ftol) >= self.D3.field >= (fmax2 - ftol)):
                     self.monitorState = "Finished2"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the FINISHED2 state. \n"
                                                                    "A strain measurement has completed and we are \n"
                                                                    "ready to begin ramping back to base field."})
                 # if we have a stable field and we're within tolerance to f_max, we're in the Finished state.
-                elif self.D3.field_status in ["Stable", "Holding","Ramping", "Iterating"]:
+                elif self.D3.field_status in ["Stable", "Holding (Driven)","Ramping", "Iterating"]:
                     self.monitorState = "Busy"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the BUSY state. \n "
                                                                    "We are cooling to base, or a strain measurement\n"
