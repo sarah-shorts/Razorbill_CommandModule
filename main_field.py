@@ -341,7 +341,7 @@ class RazorbillProgrammer (object):
                                                                    "equilibration to F_min and Temp choice."})
 
                 # if we have a stable field and we're within tolerance to F_min, we're in the Ready state.
-                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmin+ftol) >= self.D3.field >= (fmin-ftol)):
+                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((0+ftol) >= self.D3.field >= (0-ftol)):
                     print(f'waiting {self.wait_t/60} min')
                     self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for field stabilization. \n"
                                                                    f'time to wait: {self.wait_t/60}'
@@ -360,7 +360,12 @@ class RazorbillProgrammer (object):
                                                                    "ready to begin ramping back to fmin Oe."})
                     
                 # if we have a changing field we wait for stabilization
-                elif self.D3.field_status in ["Stable", "Holding (Driven)", "Ramping", "Iterating"]:
+                elif self.D3.field_status in ["Holding (Driven)", "Ramping", "Iterating"] and self.D3.temp_status in ["Tracking", "Chasing"]:
+                    self.monitorState = "Busy"
+                    self.monDict["measureStatus"].update({"value": "Ma'ii is in the BUSY state. \n "
+                                                                   "We are ramping to base field, or a strain measurement\n"
+                                                                   "is running as we ramp to the max field."})
+                elif self.D3.field_status in ["Ramping", "Iterating"] and self.D3.temp_status in ["Stable", "Tracking", "Chasing"]:
                     self.monitorState = "Busy"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the BUSY state. \n "
                                                                    "We are ramping to base field, or a strain measurement\n"
@@ -387,7 +392,7 @@ class RazorbillProgrammer (object):
                     print(f'waiting {self.wait_t1/60} min')
                     self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for thermalization. \n"
                                                                    f'time to wait: {self.wait_t1/60}'
-                                                                   })
+                                                                })
                     time.sleep(self.wait_t1)                 #Wait to thermalize before making a measurment
                     self.monitorState = "Ready1"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the READY1 state. \n"
