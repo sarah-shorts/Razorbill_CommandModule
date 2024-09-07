@@ -330,18 +330,24 @@ class RazorbillProgrammer (object):
         fmax2 = self.guiDict.get("F_max2").get("value")
         fmin2 = self.guiDict.get("F_min2").get("value")
         mode = self.guiDict.get("d3FieldExp").get("value")
+        temp = self.guiDict.get("Temp").get("value")
         ftol = 2 #Oersted
         #print(str(tmin + ttol) + ">="+ str(self.D3.temp) + ">="+str(tmin - ttol))
-        if mode == "Ramp" or mode == "Hold":
+        if mode == "Ramp":
             try:
                 if self.monitorState == "Initial":
                     print("The ppms is in the initial state")
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the INITIAL state. \n"
                                                                    "Voltages should be 0. Will now begin field\n"
                                                                    "equilibration to F_min and Temp choice."})
-
+                #check if ready to ramp field after zero field cooling
+                elif self.D3.field_status == "Holding (Driven)" and ((0+ftol) >= self.D3.field >= (0-ftol)) and self.D3.temp_status == "Stable" and ((temp-2) >= self.D3.temp >= (temp+2)):
+                    self.monitorState = "Ready0"
+                    self.monDict["measureStatus"].update({"value": "Ma'ii is in the READY INITIAL state. \n"
+                                                                   "We are ready to begin another strain increment\n"
+                                                                   "and begin a new field ramp profile."})
                 # if we have a stable field and we're within tolerance to F_min, we're in the Ready state.
-                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((0+ftol) >= self.D3.field >= (0-ftol)):
+                elif self.D3.field_status == "Holding (Driven)" and ((fmin+ftol) >= self.D3.field >= (fmin-ftol)):
                     print(f'waiting {self.wait_t/60} min')
                     self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for field stabilization. \n"
                                                                    f'time to wait: {self.wait_t/60}'
@@ -360,11 +366,10 @@ class RazorbillProgrammer (object):
                                                                    "ready to begin ramping back to fmin Oe."})
                     
                 # if we have a changing field we wait for stabilization
-                elif self.D3.field_status in ["Holding (Driven)", "Ramping", "Iterating"] and self.D3.temp_status in ["Tracking", "Chasing"]:
+                elif self.D3.field_status in ["Holding (Driven)"] and self.D3.temp_status in ["Tracking", "Chasing"]:
                     self.monitorState = "Busy"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the BUSY state. \n "
-                                                                   "We are ramping to base field, or a strain measurement\n"
-                                                                   "is running as we ramp to the max field."})
+                                                                   "We are ramping to base temp\n"})
                 elif self.D3.field_status in ["Ramping", "Iterating"] and self.D3.temp_status in ["Stable", "Tracking", "Chasing"]:
                     self.monitorState = "Busy"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the BUSY state. \n "
@@ -536,22 +541,18 @@ class RazorbillProgrammer (object):
             elif self.monitorState == "Busy":
                 #print("yo dont bother me you ass")
                 pass
+            #check if ready to ramp field in ready0 state
+            elif self.monitorState == "Ready0":
+                print("we are stable at base and ready to set min field")
+                
+                # set field to fmin
+                print('MultiVu command... go to {field}Oe at 200Oe/min'.format(field=fmin))
+                self.D3.set.field(fmin, 200, 0, 1)
 
             # check if we're in the ready state
             elif self.monitorState == "Ready":
-                print("we are stable at base and ready to set fields temps and strains")
+                print("we are stable at base and ready to set field ramp and strains")
                 
-                # set field to fmin
-                print('MultiVu command... go to {field}Oe at 100Oe/min'.format(field=fmin))
-                self.D3.set.field(fmin, 100, 0, 1)
-
-                # set the field state
-                print("have to check for the field state")
-                while self.D3.field_status != "Holding (Driven)":
-                    print("we are waiting for field to catch up...")
-                    time.sleep(1)
-                print("field state reached")
-
                 # set voltages eventually
                 self.monitor_set_voltage()
 
