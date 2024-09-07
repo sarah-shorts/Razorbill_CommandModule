@@ -117,9 +117,9 @@ class RazorbillProgrammer (object):
         self.v_table_i = 0
 
         # puppers
-        self.pup1 = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper1_smol.png")
-        self.pup2 = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper2_smol.png")
-        self.pup3 = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper3_smol.png")
+        self.pup1 = PhotoImage(file=r"pupper1_smol.png")
+        self.pup2 = PhotoImage(file=r"pupper2_smol.png")
+        self.pup3 = PhotoImage(file=r"pupper3_smol.png")
         self.pupper_counter = 0
 
         # file stream saves
@@ -1372,7 +1372,7 @@ class RazorbillProgrammer (object):
         """
 
         # if the temperature experiment is a one-shot hold, then effectively disable the rate and T_min values
-        if self.guiDict.get("d3TempExp").get("value") == "Ramp":
+        if self.guiDict.get("d3TempExp") is not None and self.guiDict.get("d3TempExp").get("value") == "Ramp":
             self.setup_chng_color("T_max2", self.gry)
             self.guiDict["T_max2"].update({"stats": "Disabled due to exp. type"})
             self.guiDict["T_max2"].update({"value": self.guiDict.get("T_max2").get("bounds")[0]})
@@ -1384,7 +1384,7 @@ class RazorbillProgrammer (object):
             self.guiDict["T_rate2"].update({"value": self.guiDict.get("T_rate2").get("bounds")[1]})
             self.tempExpWasMulti = True
         # if we return to a ramp-type, then return everything back to normal
-        if self.guiDict.get("d3TempExp").get("value") == "Multi":
+        if self.guiDict.get("d3TempExp") is not None and self.guiDict.get("d3TempExp").get("value") == "Multi":
             if self.tempExpWasMulti is False:
                 pass
             elif self.tempExpWasMulti is True:
