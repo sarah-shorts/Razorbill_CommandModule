@@ -364,6 +364,7 @@ class RazorbillProgrammer (object):
                                                                    "We are cooling to base, or a strain measurement\n"
                                                                    "is running as we heat to the max temperature."})
                 else:
+                    print(self.D3.temp_status)
                     raise StateException
 
             except StateException:
@@ -421,6 +422,7 @@ class RazorbillProgrammer (object):
                                                                    "We are cooling to base, or a strain measurement\n"
                                                                    "is running as we heat to the max temperature."})
                 else:
+                    print(self.D3.temp_status)
                     raise StateException
 
             except StateException:
