@@ -14,7 +14,6 @@ import subprocess
 from threading import Lock
 from enum import Enum, auto, IntEnum
 from datetime import datetime
-from is_pathname_valid import is_pathname_valid
 
 LINE_TERM = '\r\n'
 COMMENT_COL_HEADER = 'Comment'
@@ -124,12 +123,8 @@ class MultiVuDataFile():
         """
         self.FullPath = os.path.abspath(FileName)
         dirName, FileName = os.path.split(self.FullPath)
-        try:
-            if not dirName:
-                raise NotADirectoryError(f'Invalid file path: {FileName}. Please use a valid path.')
-        except NotADirectoryError as e:
-            if not (is_pathname_valid(FileName)):
-                raise NotADirectoryError(f'File path {FileName} is invalid.')
+        if not dirName:
+            raise NotADirectoryError(f'Invalid file path: {FileName}. Please use a valid path.')
 
         # Make sure we have the folder which is supposed to hold the
         # file in question.  If the folder already exists, move on,

@@ -117,9 +117,9 @@ class RazorbillProgrammer (object):
         self.v_table_i = 0
 
         # puppers
-        self.pup1 = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper1_smol.png")
-        self.pup2 = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper2_smol.png")
-        self.pup3 = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper3_smol.png")
+        self.pup1 = PhotoImage(file=r"pupper1_smol.png")
+        self.pup2 = PhotoImage(file=r"pupper2_smol.png")
+        self.pup3 = PhotoImage(file=r"pupper3_smol.png")
         self.pupper_counter = 0
 
         # file stream saves
@@ -269,7 +269,7 @@ class RazorbillProgrammer (object):
         # given the dictionary, we can define a widget list of placeholders
         self.setup_widgets = [[tk.Entry(self.root) for i in range(2)] for j in range(3)]
 
-        photo = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\Intro.png")
+        photo = PhotoImage(file=r"Intro.png")
         photo_label = Label(image=photo, width=750)
         photo_label.grid(row=0, column=0)
         photo_label.image = photo
@@ -967,11 +967,11 @@ class RazorbillProgrammer (object):
         # everything is better with a puppy
         photo = self.pup1
         if self.pupper_counter % 3 == 0:
-            photo = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper1_smol.png")
+            photo = PhotoImage(file=r"pupper1_smol.png")
         elif self.pupper_counter % 3 == 1:
-            photo = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper2_smol.png")
+            photo = PhotoImage(file=r"pupper2_smol.png")
         elif self.pupper_counter % 3 == 2:
-            photo = PhotoImage(file=r"C:\Users\sysadmin\Desktop\Razorbill-WilsonGroup\Razorbill_CommandModule\pupper3_smol.png")
+            photo = PhotoImage(file=r"pupper3_smol.png")
 
         photo_label = Label(image=photo, width=80, anchor=W)
         photo_label.grid(row=4, column=0)

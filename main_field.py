@@ -970,11 +970,11 @@ class RazorbillProgrammer (object):
         # everything is better with a puppy
         photo = self.pup1
         if self.pupper_counter % 3 == 0:
-            photo = PhotoImage(file=r"C:\Users\QD User\Desktop\Razorbill_CommandModule\pupper1_smol.png")
+            photo = PhotoImage(file=r"pupper1_smol.png")
         elif self.pupper_counter % 3 == 1:
-            photo = PhotoImage(file=r"C:\Users\QD User\Desktop\Razorbill_CommandModule\pupper2_smol.png")
+            photo = PhotoImage(file=r"pupper2_smol.png")
         elif self.pupper_counter % 3 == 2:
-            photo = PhotoImage(file=r"C:\Users\QD User\Desktop\Razorbill_CommandModule\pupper3_smol.png")
+            photo = PhotoImage(file=r"pupper3_smol.png")
 
         photo_label = Label(image=photo, width=80, anchor=W)
         photo_label.grid(row=4, column=0)
