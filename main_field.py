@@ -11,8 +11,8 @@ from tkinter import *
 import tkinter as tk
 from functools import partial
 import math
-from widgetInfo import guiFields
-from widgetInfo import monitorFields
+from widgetInfo_field import guiFields
+from widgetInfo_field import monitorFields
 from tkinter import messagebox
 import time
 
