@@ -14,28 +14,16 @@ class QDInstrument:
         else:
             raise Exception('This must be running on a Windows machine')
 
-        # All parameters are pulled at once with the aim of simultaneity
+        self.temp_unit = "K"
+        self.field_unit = "Oe"
 
-        # Grab temperature parameters
-        temp_status_code = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_R8, 0.0)
-        
-      #  print(temp_status_code)
-        temperature = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0)
-        
-      #  print(temperature)
-        temp_err = self._mvu.GetTemperature(temp_status_code, temperature)
-      #  print(temp_err)
+        # Instantiate the 'set' class
+        self.set = QDInstrument._set()
 
-        #self.temp = temperature.value
-        self.temp = temp_status_code.value
-        #print('self.temp'+str(self.temp))
-        #self.temp_status_code = temp_status_code.value
-        self.temp_status_code = temperature.value
-        #print('self.temp_status_code'+str(self.temp_status_code))
-
-        self._temp_err = temp_err
-
-        # Translate the status code to human-readable text
+    def _get_temp_status(self):
+        temperature = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_R8, 0)
+        temp_status_code = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0.0)
+        temp_err = self._mvu.GetTemperature(temperature, temp_status_code)
         TempStates = {
             "1": "Stable",
             "2": "Tracking",
@@ -47,29 +35,12 @@ class QDInstrument:
             "14": "Impedance Control Error",
             "15": "General Failure",
         }
-        print(self.temp_status_code)
-        print('temp: ',self.temp)
-        self.temp_status = TempStates[str(self.temp_status_code)]
-        self.temp_unit = "K"
-
-        # Grab field parameters
-        field_status_code = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_R8, 0.0)
-        field = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0)
-        field_err = self._mvu.GetField(field_status_code, field)
-
-        #self.field = field.value
-        #self.field_status_code = field_status_code.value
-
-        #self.field = field.value
-        self.field = field_status_code.value
-       # print('self.field'+str(self.field))
-        #self.field_status_code = field_status_code.value
-        self.field_status_code = field.value
-       # print('self.field_status_code'+str(self.field_status_code))
-        self._field_err = field_err
-        print(self.field_status_code)
-        print('field: ',self.field)
-        # Translate the status code to human-readable text
+        return temperature.value, TempStates[str(temp_status_code.value)], temp_err
+    
+    def _get_field_status(self):
+        field = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_R8, 0)
+        field_status_code = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0.0)
+        field_err = self._mvu.GetField(field, field_status_code)
         MagStates = {
             "0": "Undefined",
             "1": "Stable",
@@ -87,19 +58,20 @@ class QDInstrument:
             "14": "PSU Error",
             "15": "General Failure",
         }
-        self.field_status = MagStates[str(self.field_status_code)]
-        self.field_unit = "Oe"
+        return field.value, MagStates[str(field_status_code.value)], field_err
 
-        # Grab chamber parameters
-        
+    @property
+    def temp(self):
+        return self._get_temp_status()[0]
+    
+    @property
+    def temp_status(self):
+        return self._get_temp_status()[1]
+    
+    @property
+    def chamber_status(self):
         chamber_status_code = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0)
         chamber_err = self._mvu.GetChamber(chamber_status_code)
-
-        self.chamber_status_code = chamber_status_code.value
-        self._chamber_err = chamber_err
-        print(self.chamber_status_code)
-        
-        # Translate the status code to human-readable text
         ChamberStates = {
             "0": "Sealed",
             "1": "Purged and Sealed",
@@ -114,11 +86,8 @@ class QDInstrument:
             "14": "HiVac Error",
             "15": "General Failure",
         }
-        self.chamber_status = ChamberStates[str(chamber_status_code.value)]
+        return ChamberStates[int(chamber_status_code)], chamber_err
 
-        # Instantiate the 'set' class
-        self.set = QDInstrument._set()
-        
 
     class _set:
         def __init__(self):

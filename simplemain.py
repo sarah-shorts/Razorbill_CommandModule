@@ -73,6 +73,7 @@ class QDButNotAwful:
         self.framp_max = framp_max
         self.tsleep = tsleep
         self.fsleep = fsleep
+        self.qd = QDInstrument()
 
     def set_temp(self, t):
         self.qd.set.temp(t, self.tramp_max, 0)
@@ -118,10 +119,6 @@ class QDButNotAwful:
             time.sleep(self.fsleep)
             if withinpercent(f, self.get_field()) and self.qd.field_status in ["Stable", "Holding (Driven)"]:
                 break
-
-    @property
-    def qd(self):
-        return QDInstrument()
 
 
 qd = QDButNotAwful(tramp_max=10)
