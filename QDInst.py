@@ -61,13 +61,22 @@ class QDInstrument:
         return field.value, MagStates[str(field_status_code.value)], field_err
 
     @property
+    def field(self):
+        return self._get_field_status()[0]
+    
+    @property
+    def field_status(self):
+        return self._get_field_status()[1]
+    
+    @property
     def temp(self):
         return self._get_temp_status()[0]
     
     @property
     def temp_status(self):
         return self._get_temp_status()[1]
-    
+
+
     @property
     def chamber_status(self):
         chamber_status_code = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0)
