@@ -555,7 +555,7 @@ class RazorbillProgrammer (object):
                 
                 # set voltages eventually
                 self.monitor_set_voltage()
-
+                time.sleep(5)
                 # set field using F_max and F_rate
                 print('MultiVu command... go to {fmax}Oe at {rate}Oe/min'.format(fmax=fmax, rate=frate))
                 self.D3.set.field(fmax, frate, 0, 1)
