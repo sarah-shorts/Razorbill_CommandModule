@@ -341,7 +341,7 @@ class RazorbillProgrammer (object):
                                                                    "Voltages should be 0. Will now begin field\n"
                                                                    "equilibration to F_min and Temp choice."})
                 #check if ready to ramp field after zero field cooling
-                elif self.D3.field_status == "Holding (Driven)" and ((0+ftol) >= self.D3.field >= (0-ftol)) and self.D3.temp_status == "Stable" and ((temp-2) >= self.D3.temp >= (temp+2)):
+                elif self.D3.field_status == "Holding (Driven)" and ((0+ftol) >= self.D3.field >= (0-ftol)) and self.D3.temp_status == "Stable" and ((temp-2) <= self.D3.temp <= (temp+2)):
                     print(f'waiting {self.wait_t/60} min')
                     self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for field stabilization. \n"
                                                                    f'time to wait: {self.wait_t/60}'
