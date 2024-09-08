@@ -96,7 +96,7 @@ class QDButNotAwful:
 
     def ramp_field(self, start, stop, rate):
         self.wait_field(start)
-        self.qd.set.field(f, stop, rate, 0, 1)
+        self.qd.set.field(stop, rate, 0, 1)
         while True:
             time.sleep(self.fsleep)
             if self.qd.field_status in ["Ramping"]:
