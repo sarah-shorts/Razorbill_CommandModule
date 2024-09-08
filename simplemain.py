@@ -30,7 +30,7 @@ sparky_port = "ASRL10::INSTR"
 andy_port = "GPIB::28::INSTR" 
 
 def withinpercent(a, b, p = 1):
-    if a==0 or b==0:
+    if int(a) == 0 or int(b) == 0:
         if int(a) == int(b):
             return True
     elif a / b < (1 + p / 100) and a / b > (1 - p / 100):
