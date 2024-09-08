@@ -342,17 +342,17 @@ class RazorbillProgrammer (object):
                                                                    "equilibration to F_min and Temp choice."})
                 #check if ready to ramp field after zero field cooling
                 elif self.D3.field_status == "Holding (Driven)" and ((0+ftol) >= self.D3.field >= (0-ftol)) and self.D3.temp_status == "Stable" and ((temp-2) >= self.D3.temp >= (temp+2)):
+                    print(f'waiting {self.wait_t/60} min')
+                    self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for field stabilization. \n"
+                                                                   f'time to wait: {self.wait_t/60}'
+                                                                   })
+                    time.sleep(self.wait_t)                 #Wait to stabilize before making a measurment
                     self.monitorState = "Ready0"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the READY INITIAL state. \n"
                                                                    "We are ready to begin another strain increment\n"
                                                                    "and begin a new field ramp profile."})
                 # if we have a stable field and we're within tolerance to F_min, we're in the Ready state.
                 elif self.D3.field_status == "Holding (Driven)" and ((fmin+ftol) >= self.D3.field >= (fmin-ftol)):
-                    print(f'waiting {self.wait_t/60} min')
-                    self.monDict["measureStatus"].update({"value": "Ma'ii is waiting for field stabilization. \n"
-                                                                   f'time to wait: {self.wait_t/60}'
-                                                                   })
-                    time.sleep(self.wait_t)                 #Wait to stabilize before making a measurment
                     self.monitorState = "Ready"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the READY state. \n"
                                                                    "We are ready to begin another strain increment\n"
@@ -376,7 +376,6 @@ class RazorbillProgrammer (object):
                                                                    "We are ramping to base field, or a strain measurement\n"
                                                                    "is running as we ramp to the max field."})
                 else:
-                    print(self.D3.field_status)
                     raise StateException
 
             except StateException:
