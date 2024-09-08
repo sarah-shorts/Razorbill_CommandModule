@@ -17,7 +17,7 @@ VAS   = np.array([0,5,10,15,20]) # Voltages on CH1 Tension MAX V is 50V
 VBS   = np.zeros_like(VAS)     # Zeros on CH2
 FIELD = (-90_000, 90_000, 50)  # -90k Oe to 90k Oe at 10 Oe/sec?
 
-QD_FILES = r"C:\Users\sysadmin\desktop\Razobill-WilsonGroup\Sarah\*.dat"
+QD_FILES = r"C:/Users/sysadmin/Desktop/Razobill-WilsonGroup/Sarah/*.dat"
 QD_FILE = max(glob.glob(QD_FILES), key=os.path.getctime)
 print("Using File:", QD_FILE)
 
