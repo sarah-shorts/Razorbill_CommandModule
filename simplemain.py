@@ -10,11 +10,12 @@ from pyvisa import ResurceManager
 
 TRANSITION_TEMP = 50           # Warm to this with zero field, zero voltage
 
-TEMPS = np.linspace(30, 31, 1) # Just one temp, 30K
-VAS   = np.linspace(5, 15, 30) # Voltages on CH1
+TEMPS = [30, 15, 10, 5, 2] # Just one temp, 30K
+VAS   = np.array([0,5,10,15,20]) # Voltages on CH1 Tension MAX V is 50V
 VBS   = np.zeros_like(VAS)     # Zeros on CH2
 FIELD = (-90_000, 90_000, 10)  # -90k Oe to 90k Oe at 10 Oe/sec?
 
+assert len(VAS) == len(VBS)
 
 rm = ResurceManager()
 
@@ -70,7 +71,15 @@ class QDButNotAwful:
 
     def set_field(self, f):
         self.qd.set.field(f, self.framp_max, 0, 1)
-
+        
+    def zero_field(self):
+        self.wait_field(self.get_field()/10)
+        self.set.field(0, self.framp_max, 2, 1)
+        while True:
+            time.sleep(self.tsleep)
+            if self.qd.temp_status == "Stable":
+                break
+        
     def get_field(self):
         return self.qd.field
 
@@ -115,11 +124,11 @@ measurments = []
 
 sparky.ch1(0)
 sparky.ch2(0)
-qd.set_field(0)
+qd.zero_field()
 qd.wait_temp(TRANSITION_TEMP)
 
 for temp in TEMPS:
-    qd.wait_field(0)
+    qd.zero_field()
     qd.wait_temp(temp)
     for va, vb in zip(VAS, VBS):
         sparky.ch1(va)
@@ -135,6 +144,7 @@ for temp in TEMPS:
                     andy.capacitance_string(),
                 )
             )
+            print(measurements[-1])
 
 
 pickle.dump(measurments , open("mymeasurements-{:f}.pkl".format(time.time()), "wb"))
