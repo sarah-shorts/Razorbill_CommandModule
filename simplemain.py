@@ -1,0 +1,140 @@
+import time
+import pickle
+
+import numpy as np
+
+from dataclasses import dataclass
+from QDInst import QDInstrument
+from pyvisa import ResurceManager
+
+
+TRANSITION_TEMP = 50           # Warm to this with zero field, zero voltage
+
+TEMPS = np.linspace(30, 31, 1) # Just one temp, 30K
+VAS   = np.linspace(5, 15, 30) # Voltages on CH1
+VBS   = np.zeros_like(VAS)     # Zeros on CH2
+FIELD = (-90_000, 90_000, 10)  # -90k Oe to 90k Oe at 10 Oe/sec?
+
+
+rm = ResurceManager()
+
+class Sparky:
+    def __init__(self, label="ASRL10::INSTR"):
+        self.sparky = rm.open_resource(label)
+
+    def ch1(self, voltage):
+        self.sparky.write("outp1 1")
+        self.sparky.write("sour1:volt {:f}".format(voltage))
+
+    def ch2(self, voltage):
+        self.sparky.write("outp2 1")
+        self.sparky.write("sour2:volt {:f}".format(voltage))
+
+    def __del__(self):
+        """
+        Grounds the outputs when the program ends
+        """
+        self.sparky.write("sour1:volt 0")
+        self.sparky.write("outp1 0")
+        self.sparky.write("sour2:volt 0")
+        self.sparky.write("outp2 0")
+
+
+class Andy:
+    def __init__(self, label="GPIB::28::INSTR"):
+        self.andy = rm.open_resource(label)
+
+    def capacitance_string(self):
+        return self.andy.query("FETCH")
+
+
+class QDButNotAwful:
+    def __init__(self, tramp_max, framp_max=220, tsleep=0.5, fsleep=0.5):
+        self.tramp_max = tramp_max
+        self.framp_max = framp_max
+        self.tsleep = tsleep
+        self.fsleep = fsleep
+
+    def set_temp(self, t):
+        self.qd.set.temp(t, self.tramp_max, 0)
+
+    def get_temp(self):
+        return self.qd.temp
+
+    def wait_temp(self, t):
+        self.set_temp(t)
+        while True:
+            time.sleep(self.tsleep)
+            if self.qd.temp_status == "Stable":
+                break
+
+    def set_field(self, f):
+        self.qd.set.field(f, self.framp_max, 0, 1)
+
+    def get_field(self):
+        return self.qd.field
+
+    def ramp_field(self, start, stop, rate):
+        self.wait_field(start)
+        self.qd.set.field(f, stop, rate, 0, 1)
+        while True:
+            time.sleep(self.fsleep)
+            if self.qd.field_status in ["Ramping"]:
+                break
+
+    def ramp_complete(self):
+        return self.qd.field_status in ["Stable", "Holding (Driven)"]
+
+    def wait_field(self, f):
+        self.set_field(f)
+        while True:
+            time.sleep(self.fsleep)
+            if self.qd.field_status in ["Stable", "Holding (Driven)"]:
+                break
+
+    @property
+    def qd(self):
+        return QDInstrument()
+
+
+qd = QDButNotAwful(tramp_max=10)
+
+sparky = Sparky()
+andy = Andy()
+
+
+@dataclass
+class Measurment:
+    temp: float
+    voltages: tuple[float, float]
+    field: float
+    capstring: str
+
+
+measurments = []
+
+sparky.ch1(0)
+sparky.ch2(0)
+qd.set_field(0)
+qd.wait_temp(TRANSITION_TEMP)
+
+for temp in TEMPS:
+    qd.wait_field(0)
+    qd.wait_temp(temp)
+    for va, vb in zip(VAS, VBS):
+        sparky.ch1(va)
+        sparky.ch2(vb)
+
+        qd.ramp_field(*FIELD)
+        while not qd.ramp_complete():
+            measurments.append(
+                Measurment(
+                    temp,
+                    (va, vb),
+                    qd.get_field(),
+                    andy.capacitance_string(),
+                )
+            )
+
+
+pickle.dump(measurments , open("mymeasurements-{:f}.pkl".format(time.time()), "wb"))
