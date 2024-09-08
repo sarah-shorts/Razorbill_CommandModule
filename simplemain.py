@@ -85,7 +85,7 @@ class QDButNotAwful:
         
     def zero_field(self):
         self.wait_field(self.get_field()/10)
-        self.set.field(0, self.framp_max, 2, 1)
+        self.qd.set.field(0, self.framp_max, 2, 1)
         while True:
             time.sleep(self.tsleep)
             if self.qd.temp_status == "Stable":
