@@ -332,7 +332,7 @@ class RazorbillProgrammer (object):
         mode = self.guiDict.get("d3FieldExp").get("value")
         temp = self.guiDict.get("Temp").get("value")
         ftol = 2 #Oersted
-        #print(str(tmin + ttol) + ">="+ str(self.D3.temp) + ">="+str(tmin - ttol))
+        print("Entered in", self.monitorState)
         if mode == "Ramp":
             try:
                 if self.monitorState == "Initial":
@@ -359,14 +359,14 @@ class RazorbillProgrammer (object):
                                                                    "and begin a new field ramp profile."})
                     
                 # if we have a stable field and we're within tolerance to f_max, we're in the Finished state.
-                elif self.D3.field_status in ["Stable", "Holding (Driven)"] and ((fmax+ftol) >= self.D3.field >= (fmax-ftol)):
+                elif self.D3.field_status == "Holding (Driven)" and ((fmax+ftol) >= self.D3.field >= (fmax-ftol)):
                     self.monitorState = "Finished"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the FINISHED state. \n"
                                                                    "A strain measurement has completed and we are \n"
                                                                    "ready to begin ramping back to fmin Oe."})
                     
                 # if we have a changing field we wait for stabilization
-                elif self.D3.field_status in ["Holding (Driven)"] and self.D3.temp_status in ["Tracking", "Chasing"]:
+                elif self.D3.field_status == "Holding (Driven)" and self.D3.temp_status in ["Tracking", "Chasing"]:
                     self.monitorState = "Busy"
                     self.monDict["measureStatus"].update({"value": "Ma'ii is in the BUSY state. \n "
                                                                    "We are ramping to base temp\n"})
@@ -439,6 +439,7 @@ class RazorbillProgrammer (object):
 
             except StateException:
                 print("Something has gone very wrong and we've gone into an undefined state")
+        print("Exited in", self.monitorState)
 
     def monitor_set_voltage(self):
         """
@@ -566,9 +567,9 @@ class RazorbillProgrammer (object):
 
                 print("the measurement has completed and we're ready to cool again")
 
-                # set field to H_field ZFC condition
-                print('MultiVu command... go to {field}Oe at 100Oe/min'.format(field=fmin))
-                self.D3.set.field(fmin, 100, 0, 1)
+                # set field to fmin for next voltage
+                print('MultiVu command... go to {field}Oe at 200Oe/min'.format(field=fmin))
+                self.D3.set.field(fmin, 200, 0, 1)
 
                 print("have to check for the field state")
                 while self.D3.field_status != "Holding (Driven)":
