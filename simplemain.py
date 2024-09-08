@@ -29,6 +29,10 @@ rm = ResourceManager()
 sparky_port = "ASRL10::INSTR"
 andy_port = "GPIB::28::INSTR" 
 
+def withinpercent(a, b, p = 1):
+    if a / b < (1 + p / 100) and a / b > (1 - p / 100):
+        return True
+    return False
 
 class Sparky:
     def __init__(self, label=sparky_port):
@@ -77,7 +81,7 @@ class QDButNotAwful:
         self.set_temp(t)
         while True:
             time.sleep(self.tsleep)
-            if self.qd.temp_status == "Stable":
+            if withinpercent(t, self.get_temp()) and self.qd.temp_status == "Stable":
                 break
 
     def set_field(self, f):
@@ -88,7 +92,7 @@ class QDButNotAwful:
         self.qd.set.field(0, self.framp_max, 2, 1)
         while True:
             time.sleep(self.tsleep)
-            if self.qd.temp_status == "Stable":
+            if withinpercent(0, self.get_field()) and self.qd.field_status in ["Stable", "Holding (Driven)"]:
                 break
         
     def get_field(self):
@@ -109,7 +113,7 @@ class QDButNotAwful:
         self.set_field(f)
         while True:
             time.sleep(self.fsleep)
-            if self.qd.field_status in ["Stable", "Holding (Driven)"]:
+            if withinpercent(f, self.get_field()) and self.qd.field_status in ["Stable", "Holding (Driven)"]:
                 break
 
     @property
