@@ -13,8 +13,8 @@ from pyvisa import ResourceManager
 TRANSITION_TEMP = 30           # Warm to this with zero field, zero voltage
 
 TEMPS = [30, 10, 5, 2] # Just one temp, 30K
-VAS   = np.array([0,10,20]) # Voltages on CH1 Tension MAX V is 50V
-VBS   = np.zeros_like(VAS)     # Zeros on CH2
+VAS   = np.array([0,10,20]) # Voltages on CH1 Tension
+VBS   = np.zeros_like(VAS)     # Zeros on CH2 Compression
 FIELD = (-90_000, 90_000, 50)  # -90k Oe to 90k Oe at 10 Oe/sec?
 
 QD_FILES = r"C:/Users/sysadmin/Desktop/Razorbill-WilsonGroup/Sarah/"
