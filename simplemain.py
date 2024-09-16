@@ -62,12 +62,12 @@ class Sparky:
         self.sparky.write("sour2:volt {:f}".format(voltage))
     
     def ch1_ramp(self, voltage):
-        for v in np.arange(self.ch1, voltage, 0.1, endpoint=True):
+        for v in np.arange(self.ch1, voltage, 0.1):
             self.ch1 = v
         self.ch1 = voltage
     
     def ch2_ramp(self, voltage):
-        for v in np.arange(self.ch2, voltage, 0.1, endpoint=True):
+        for v in np.arange(self.ch2, voltage, 0.1):
             self.ch2 = v
         self.ch2 = voltage
 
