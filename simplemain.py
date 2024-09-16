@@ -45,11 +45,11 @@ class Sparky:
 
     @property
     def ch1(self):
-        return float(self.sparky.query("sour1:volt"))
+        return float(self.sparky.query("sour1:volt?"))
 
     @property
     def ch2(self):
-        return float(self.sparky.query("sour2:volt"))
+        return float(self.sparky.query("sour2:volt?"))
 
     @ch1.setter
     def ch1(self, voltage):
