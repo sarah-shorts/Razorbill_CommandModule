@@ -13,7 +13,7 @@ from pyvisa import ResourceManager
 TRANSITION_TEMP = 30           # Warm to this with zero field, zero voltage
 
 TEMPS = [30, 10, 5, 2] # Just one temp, 30K
-VAS   = np.array([0,10,20]) # Voltages on CH1 Tension
+VAS   = np.array([0, 20, 30, 50, 70, 90, 110]) # Voltages on CH1 Tension
 VBS   = np.zeros_like(VAS)     # Zeros on CH2 Compression
 FIELD = (-90_000, 90_000, 50)  # -90k Oe to 90k Oe at 10 Oe/sec?
 
@@ -38,16 +38,38 @@ def withinpercent(a, b, p = 1):
     return False
 
 class Sparky:
-    def __init__(self, label=sparky_port):
+    def __init__(self, rm, label=sparky_port):
         self.sparky = rm.open_resource(label)
+        # Store a reference to the resource manager so this gets dropped first
+        self.__rm = rm
 
+    @property
+    def ch1(self):
+        return float(self.sparky.query("sour1:volt"))
+
+    @property
+    def ch2(self):
+        return float(self.sparky.query("sour2:volt"))
+
+    @ch1.setter
     def ch1(self, voltage):
         self.sparky.write("outp1 1")
         self.sparky.write("sour1:volt {:f}".format(voltage))
 
+    @ch2.setter
     def ch2(self, voltage):
         self.sparky.write("outp2 1")
         self.sparky.write("sour2:volt {:f}".format(voltage))
+    
+    def ch1_ramp(self, voltage):
+        for v in np.linspace(self.ch1, voltage, 0.1, endpoint=True):
+            self.ch1 = v
+        self.ch1 = voltage
+    
+    def ch2_ramp(self, voltage):
+        for v in np.linspace(self.ch2, voltage, 0.1, endpoint=True):
+            self.ch2 = v
+        self.ch2 = voltage
 
     def __del__(self):
         """
@@ -60,8 +82,9 @@ class Sparky:
 
 
 class Andy:
-    def __init__(self, label=andy_port):
+    def __init__(self, rm, label=andy_port):
         self.andy = rm.open_resource(label)
+        self.__rm = rm
 
     def capacitance_string(self):
         return self.andy.query("FETCH")
@@ -123,8 +146,8 @@ class QDButNotAwful:
 
 qd = QDButNotAwful(tramp_max=10)
 
-sparky = Sparky()
-andy = Andy()
+sparky = Sparky(rm)
+andy = Andy(rm)
 
 
 @dataclass
@@ -138,21 +161,23 @@ class Measurment:
 
 measurments = []
 
-sparky.ch1(0)
-sparky.ch2(0)
+#intitiate starting sequence
+sparky.ch1 = 0
+sparky.ch2 = 0
 qd.zero_field()
-qd.wait_temp(TRANSITION_TEMP)
+qd.wait_temp(TEMPS[0])
 
-for temp in TEMPS:
-    qd.zero_field()
-    qd.wait_temp(temp)
-    for va, vb in zip(VAS, VBS):
-        sparky.ch1(va)
-        sparky.ch2(vb)
-
+#measure for each condition
+for va, vb in zip(VAS, VBS):
+    sparky.ch1_ramp(va)
+    sparky.ch2_ramp(vb)
+    
+    for temp in TEMPS:
+        qd.zero_field()
+        qd.wait_temp(temp)
         pickle.dump((measurments, open(QD_FILE, "r").read()) , open("backup-{:f}.pkl".format(time.time()), "wb"))
-
         qd.ramp_field(*FIELD)
+        
         while not qd.ramp_complete():
             lines = open(QD_FILE, 'r').readlines()
             measurments.append(
@@ -165,5 +190,14 @@ for temp in TEMPS:
                 )
             )
             print(measurments[-1])
-
+        
+#output data file
 pickle.dump((measurments, open(QD_FILE, "r").read()) , open("mymeasurements-{:f}.pkl".format(time.time()), "wb"))
+
+#outro sequence
+sparky.ch1 = 0
+sparky.ch2 = 0
+qd.zero_field()
+qd.wait_temp(300)
+
+#### END ####
